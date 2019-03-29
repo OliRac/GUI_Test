@@ -1,7 +1,7 @@
 #include <iostream>
 #include <ostream>
 #include <string>
-#include "SDL.h"
+#include <SDL.h>
 
 using namespace std;
 
