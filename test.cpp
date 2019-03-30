@@ -1,83 +1,61 @@
 #include <iostream>
 #include <ostream>
-#include <string>
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/System/Clock.hpp>
+#include <SFML/Window/Event.hpp>
 #include <SFML/OpenGL.hpp>
+#include <imgui.h>
+#include <imgui-SFML.h>
 
 using std::cout;
 using std::endl;
 
-int main(int argc, char * argv []) {
-	sf::RenderWindow window(sf::VideoMode(200,200), "Hi!", sf::Style::Close);
+int main() {
+	sf::RenderWindow window(sf::VideoMode(640, 480), "", sf::Style::Close);
 	window.setVerticalSyncEnabled(true);
+	ImGui::SFML::Init(window, true);
 
-	sf::CircleShape shape(100.f);
+	sf::Color bgColor;
+	float color[3] = { 0.f, 0.f, 0.f };
+	char windowTitle[255] = "ImGui + SFML";
 
-	sf::Color color = sf::Color::Green;
-	shape.setFillColor(color);
-
-	sf::Font font;
-
-	if (!font.loadFromFile("fonts/Roboto.ttf")) {
-		cout << "Font loading error" << endl;
-	}
-
-	sf::Text text;
-	text.setFont(font);
-	text.setString(":D");
-	text.setCharacterSize(24);
-	text.setFillColor(sf::Color::White);
+	window.setTitle(windowTitle);
+	window.resetGLStates();
+	sf::Clock deltaClock;
 
 	while (window.isOpen()) {
 		sf::Event event;
 		while (window.pollEvent(event)) {
+			ImGui::SFML::ProcessEvent(event);
+
 			if (event.type == sf::Event::Closed) {
 				window.close();
 			}
-
-			if (event.type == sf::Event::MouseButtonPressed) {
-
-				if (event.mouseButton.button == sf::Mouse::Left) {
-					color = sf::Color::Blue;
-					cout << "Well, it's blue now." << endl;
-				}
-
-				if (event.mouseButton.button == sf::Mouse::Right) {
-					color = sf::Color::White;
-					cout << "Now it's white." << endl;
-				}
-
-				if (event.mouseButton.button == sf::Mouse::Middle) {
-					color = sf::Color::Black;
-					cout << "Where did it go? :(" << endl;
-				}
-			}
-
-			if (event.type == sf::Event::KeyPressed) {
-				if (event.key.code == sf::Keyboard::Up) {
-					if (color.r < 255) {
-						color.r++;
-					}
-				}
-				
-				if (event.key.code == sf::Keyboard::Down) {
-					if (color.r > 0) {
-						color.r--;
-					}
-				}
-
-				cout << "Red: " << int(color.r) << endl;
-			}
 		}
 
-		shape.setFillColor(color);
-		window.clear();
+		ImGui::SFML::Update(window, deltaClock.restart());
 
-		window.draw(shape);
-		window.draw(text);
+		ImGui::Begin("Sample window");
 
+		if (ImGui::ColorEdit3("Background color", color)) {
+			bgColor.r = static_cast<sf::Uint8>(color[0] * 255.f);
+			bgColor.g = static_cast<sf::Uint8>(color[1] * 255.f);
+			bgColor.b = static_cast<sf::Uint8>(color[2] * 255.f);
+		}
+
+		ImGui::InputText("Window title", windowTitle, 255);
+
+		if (ImGui::Button("Update window title")) {
+			window.setTitle(windowTitle);
+		}
+		ImGui::End();
+
+		window.clear(bgColor);
+		ImGui::SFML::Render(window);
 		window.display();
 	}
+
+	ImGui::SFML::Render(window);
 
 	return 0;
 }
