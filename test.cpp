@@ -8,13 +8,25 @@ using std::cout;
 using std::endl;
 
 int main(int argc, char * argv []) {
-	sf::RenderWindow window(sf::VideoMode(200,200), "Hello world!", sf::Style::Close);
+	sf::RenderWindow window(sf::VideoMode(200,200), "Hi!", sf::Style::Close);
 	window.setVerticalSyncEnabled(true);
 
 	sf::CircleShape shape(100.f);
 
 	sf::Color color = sf::Color::Green;
 	shape.setFillColor(color);
+
+	sf::Font font;
+
+	if (!font.loadFromFile("fonts/Roboto.ttf")) {
+		cout << "Font loading error" << endl;
+	}
+
+	sf::Text text;
+	text.setFont(font);
+	text.setString(":D");
+	text.setCharacterSize(24);
+	text.setFillColor(sf::Color::White);
 
 	while (window.isOpen()) {
 		sf::Event event;
@@ -60,7 +72,10 @@ int main(int argc, char * argv []) {
 
 		shape.setFillColor(color);
 		window.clear();
+
 		window.draw(shape);
+		window.draw(text);
+
 		window.display();
 	}
 
