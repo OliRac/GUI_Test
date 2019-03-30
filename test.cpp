@@ -13,7 +13,7 @@ using std::endl;
 int main() {
 	sf::RenderWindow window(sf::VideoMode(640, 480), "", sf::Style::Close);
 	window.setVerticalSyncEnabled(true);
-	ImGui::SFML::Init(window, true);
+	ImGui::SFML::Init(window);
 
 	sf::Color bgColor;
 	float color[3] = { 0.f, 0.f, 0.f };
@@ -50,12 +50,19 @@ int main() {
 		}
 		ImGui::End();
 
+
+		ImGui::Begin("Second Window");
+
+		ImGui::Text("HI! I'm a second window!");
+
+		ImGui::End();
+
 		window.clear(bgColor);
 		ImGui::SFML::Render(window);
 		window.display();
 	}
 
-	ImGui::SFML::Render(window);
+	ImGui::SFML::Shutdown();
 
 	return 0;
 }
