@@ -1,48 +1,67 @@
 #include <iostream>
 #include <ostream>
 #include <string>
-#include <SDL.h>
+#include <SFML/Graphics.hpp>
+#include <SFML/OpenGL.hpp>
 
-using namespace std;
-
-const int WIDTH = 640;
-const int HEIGHT = 480;
-
-void logSDLError(ostream &os, const string &msg) {
-	os << msg << " error: " << SDL_GetError() << std::endl;
-}
+using std::cout;
+using std::endl;
 
 int main(int argc, char * argv []) {
-	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
-		cout << "SDL Initialization error" << SDL_GetError;
-	}
-	else {
-		cout << "SDL Initialized properly";
-	}
+	sf::RenderWindow window(sf::VideoMode(200,200), "Hello world!", sf::Style::Close);
+	window.setVerticalSyncEnabled(true);
 
+	sf::CircleShape shape(100.f);
 
-	SDL_Window *window = SDL_CreateWindow("Hello World!", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+	sf::Color color = sf::Color::Green;
+	shape.setFillColor(color);
 
-	if (!window) {
-		logSDLError(cout, "Window");
-	}
+	while (window.isOpen()) {
+		sf::Event event;
+		while (window.pollEvent(event)) {
+			if (event.type == sf::Event::Closed) {
+				window.close();
+			}
 
-	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+			if (event.type == sf::Event::MouseButtonPressed) {
 
-	if (!renderer) {
-		logSDLError(cout, "Renderer");
-	}
+				if (event.mouseButton.button == sf::Mouse::Left) {
+					color = sf::Color::Blue;
+					cout << "Well, it's blue now." << endl;
+				}
 
-	SDL_Event e;
-	bool quit = false;
+				if (event.mouseButton.button == sf::Mouse::Right) {
+					color = sf::Color::White;
+					cout << "Now it's white." << endl;
+				}
 
+				if (event.mouseButton.button == sf::Mouse::Middle) {
+					color = sf::Color::Black;
+					cout << "Where did it go? :(" << endl;
+				}
+			}
 
-	while (!quit) {
-		while (SDL_PollEvent(&e)) {
-			if (e.type == SDL_KEYDOWN) {
-				quit = true;
+			if (event.type == sf::Event::KeyPressed) {
+				if (event.key.code == sf::Keyboard::Up) {
+					if (color.r < 255) {
+						color.r++;
+					}
+				}
+				
+				if (event.key.code == sf::Keyboard::Down) {
+					if (color.r > 0) {
+						color.r--;
+					}
+				}
+
+				cout << "Red: " << int(color.r) << endl;
 			}
 		}
+
+		shape.setFillColor(color);
+		window.clear();
+		window.draw(shape);
+		window.display();
 	}
 
 	return 0;
