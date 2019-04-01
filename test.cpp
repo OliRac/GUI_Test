@@ -1,20 +1,27 @@
 #include <iostream>
-#include <ostream>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/OpenGL.hpp>
 #include <imgui.h>
 #include <imgui-SFML.h>
+#include <thread>
 
-using std::cout;
-using std::endl;
+using namespace std;
 
-int main() {
+class TextData {
+public:
+	static const int CHAR_SIZE = 255;
+	TextData() {}
+	~TextData() {}
+	string windowText = "";
+};
+
+void action1(TextData * data) {
 	sf::RenderWindow window(sf::VideoMode(640, 480), "", sf::Style::Close);
 	window.setVerticalSyncEnabled(true);
-	ImGui::SFML::Init(window);
 
+	ImGui::SFML::Init(window);
 	sf::Color bgColor;
 	float color[3] = { 0.f, 0.f, 0.f };
 	char windowTitle[255] = "ImGui + SFML";
@@ -22,7 +29,7 @@ int main() {
 	window.setTitle(windowTitle);
 	window.resetGLStates();
 	sf::Clock deltaClock;
-
+	
 	while (window.isOpen()) {
 		sf::Event event;
 		while (window.pollEvent(event)) {
@@ -35,25 +42,11 @@ int main() {
 
 		ImGui::SFML::Update(window, deltaClock.restart());
 
-		ImGui::Begin("Sample window");
-
-		if (ImGui::ColorEdit3("Background color", color)) {
-			bgColor.r = static_cast<sf::Uint8>(color[0] * 255.f);
-			bgColor.g = static_cast<sf::Uint8>(color[1] * 255.f);
-			bgColor.b = static_cast<sf::Uint8>(color[2] * 255.f);
-		}
-
-		ImGui::InputText("Window title", windowTitle, 255);
-
-		if (ImGui::Button("Update window title")) {
-			window.setTitle(windowTitle);
-		}
-		ImGui::End();
-
-
 		ImGui::Begin("Second Window");
 
-		ImGui::Text("HI! I'm a second window!");
+		if (data->windowText != "") {
+			ImGui::Text(data->windowText.c_str());
+		}
 
 		ImGui::End();
 
@@ -63,6 +56,26 @@ int main() {
 	}
 
 	ImGui::SFML::Shutdown();
+}
+
+void action2(TextData * data) {
+	cout << "Type something" << endl;
+
+	 getline(cin, data->windowText);
+
+	 cout << "Check the GUI!";
+}
+
+int main() {
+	TextData * data = new TextData();
+
+	thread first(action1, data);
+	thread second(action2, data);
+
+	first.join();
+	second.join();
+
+	delete data;
 
 	return 0;
 }
