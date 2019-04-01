@@ -9,15 +9,7 @@
 
 using namespace std;
 
-class TextData {
-public:
-	static const int CHAR_SIZE = 255;
-	TextData() {}
-	~TextData() {}
-	string windowText = "";
-};
-
-void action1(TextData * data) {
+int main() {
 	sf::RenderWindow window(sf::VideoMode(640, 480), "", sf::Style::Close);
 	window.setVerticalSyncEnabled(true);
 
@@ -29,7 +21,7 @@ void action1(TextData * data) {
 	window.setTitle(windowTitle);
 	window.resetGLStates();
 	sf::Clock deltaClock;
-	
+
 	while (window.isOpen()) {
 		sf::Event event;
 		while (window.pollEvent(event)) {
@@ -44,8 +36,16 @@ void action1(TextData * data) {
 
 		ImGui::Begin("Second Window");
 
-		if (data->windowText != "") {
-			ImGui::Text(data->windowText.c_str());
+		string say;
+
+		cout << "Type something" << endl;
+
+		getline(cin, say);
+
+		cout << "Check the GUI!";
+
+		if (say != "") {
+			ImGui::Text(say.c_str());
 		}
 
 		ImGui::End();
@@ -56,26 +56,6 @@ void action1(TextData * data) {
 	}
 
 	ImGui::SFML::Shutdown();
-}
-
-void action2(TextData * data) {
-	cout << "Type something" << endl;
-
-	 getline(cin, data->windowText);
-
-	 cout << "Check the GUI!";
-}
-
-int main() {
-	TextData * data = new TextData();
-
-	thread first(action1, data);
-	thread second(action2, data);
-
-	first.join();
-	second.join();
-
-	delete data;
 
 	return 0;
 }
